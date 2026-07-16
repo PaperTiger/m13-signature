@@ -1,0 +1,9 @@
+# GitHub Pages (Jekyll) build config.
+#
+# The two static signature files are kept in the repo as design reference, but
+# excluding them here keeps them out of the published site — index.html (the
+# builder) is the only page served. They stay in git; they just aren't hosted.
+exclude:
+  - M13_email-signature_1.html
+  - M13_email-signature_2.html
+  - README.md

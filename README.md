@@ -87,6 +87,10 @@ to `m13.co`, which is the live site and carries M13's Google Workspace MX record
 designs the builder was derived from, kept for reference. The builder is the source of
 truth — prefer it over copying these by hand.
 
+They are **not published**: `_config.yml` excludes them from the Pages build, so
+`index.html` is the only page the site serves. They remain in the repo and in git
+history. If you ever want them hosted again, drop them from the `exclude:` list.
+
 ## Local preview
 
 The app is a single self-contained file with no build step. Serve the folder over HTTP
