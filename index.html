@@ -1,50 +1,577 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="robots" content="noindex">
-  <title>M13 Email Signatures</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 40px 24px;
-      background: #f5f5f8;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
-      color: #1a1a3d;
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>M13 Signature Builder</title>
+<style>
+  :root{
+    --paper:#F4F5F9; --surface:#FFFFFF; --surface-2:#FAFAFD;
+    --ink:#1A1A3D; --muted:#5C5C77; --line:#E3E3EC;
+    --brand:#1A1A3D; --accent:#1F5FFF; --accent-strong:#1747CC; --accent-ink:#FFFFFF;
+    --danger:#B4442F;
+    --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+    --radius:10px; --radius-sm:8px;
+    --shadow: 0 1px 2px rgba(26,26,61,.06), 0 8px 24px rgba(26,26,61,.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#0B0B16; --surface:#14142A; --surface-2:#101024;
+      --ink:#E9E9F2; --muted:#9494AE; --line:#282845;
+      --brand:#12122B; --accent:#5B8CFF; --accent-strong:#7BA4FF; --accent-ink:#0B0B16;
+      --danger:#E08165;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 30px rgba(0,0,0,.35);
     }
-    .wrap { max-width: 680px; margin: 0 auto; }
-    h1 { font-size: 20px; margin: 0 0 4px; }
-    p.lede { margin: 0 0 32px; color: #3d3d3d; font-size: 14px; }
-    h2 { font-size: 14px; font-weight: 600; margin: 0 0 8px; }
-    .card {
-      background: #fff;
-      border: 1px solid #e3e3ec;
-      border-radius: 8px;
-      overflow: hidden;
-      margin: 0 0 12px;
-    }
-    iframe { display: block; width: 100%; border: 0; }
-    section { margin: 0 0 40px; }
-    a { color: #1a1a3d; font-size: 13px; }
-  </style>
-</head>
-<body>
-  <div class="wrap">
-    <h1>M13 email signatures</h1>
-    <p class="lede">Select a signature, copy it, and paste into your mail client&rsquo;s signature editor.</p>
+  }
+  :root[data-theme="light"]{
+    --paper:#F4F5F9; --surface:#FFFFFF; --surface-2:#FAFAFD;
+    --ink:#1A1A3D; --muted:#5C5C77; --line:#E3E3EC;
+    --brand:#1A1A3D; --accent:#1F5FFF; --accent-strong:#1747CC; --accent-ink:#FFFFFF;
+    --danger:#B4442F; --shadow: 0 1px 2px rgba(26,26,61,.06), 0 8px 24px rgba(26,26,61,.06);
+  }
+  :root[data-theme="dark"]{
+    --paper:#0B0B16; --surface:#14142A; --surface-2:#101024;
+    --ink:#E9E9F2; --muted:#9494AE; --line:#282845;
+    --brand:#12122B; --accent:#5B8CFF; --accent-strong:#7BA4FF; --accent-ink:#0B0B16;
+    --danger:#E08165; --shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 30px rgba(0,0,0,.35);
+  }
 
-    <section>
-      <h2>Option 1 &mdash; horizontal</h2>
-      <div class="card"><iframe src="M13_email-signature_1.html" height="150" title="Signature option 1"></iframe></div>
-      <a href="M13_email-signature_1.html">Open standalone &rarr;</a>
-    </section>
+  *{box-sizing:border-box;}
+  body{background:var(--paper);color:var(--ink);font-family:var(--font-sans);
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;line-height:1.5;}
+  .wrap{max-width:1120px;margin:0 auto;padding:28px 24px 72px;}
 
-    <section>
-      <h2>Option 2 &mdash; stacked with banner</h2>
-      <div class="card"><iframe src="M13_email-signature_2.html" height="200" title="Signature option 2"></iframe></div>
-      <a href="M13_email-signature_2.html">Open standalone &rarr;</a>
-    </section>
+  /* Header */
+  header.top{display:flex;align-items:center;gap:14px;padding-bottom:20px;
+    border-bottom:1px solid var(--line);margin-bottom:28px;}
+  header.top img.logo{width:62px;height:auto;display:block;flex:0 0 auto;}
+  @media (prefers-color-scheme: dark){ header.top img.logo{filter:invert(1) brightness(1.6);} }
+  :root[data-theme="dark"] header.top img.logo{filter:invert(1) brightness(1.6);}
+  :root[data-theme="light"] header.top img.logo{filter:none;}
+  .brandwrap{display:flex;flex-direction:column;gap:2px;min-width:0;}
+  .brandwrap .eyebrow{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--accent);font-weight:700;}
+  .brandwrap h1{font-size:1.32rem;font-weight:650;margin:0;letter-spacing:-.01em;text-wrap:balance;}
+
+  /* Layout */
+  .grid{display:grid;grid-template-columns:minmax(0,400px) minmax(0,1fr);gap:36px;align-items:start;}
+  @media (max-width:900px){ .grid{grid-template-columns:1fr;gap:28px;} }
+
+  /* Form */
+  form{display:flex;flex-direction:column;gap:26px;}
+  fieldset{border:0;padding:0;margin:0;display:flex;flex-direction:column;gap:14px;}
+  legend{padding:0;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;
+    font-weight:700;color:var(--muted);margin-bottom:2px;}
+  .field{display:flex;flex-direction:column;gap:5px;}
+  .field label{font-size:.82rem;font-weight:600;color:var(--ink);}
+  .field .hint{font-size:.72rem;color:var(--muted);}
+  .field input{font:inherit;font-size:.9rem;color:var(--ink);background:var(--surface);
+    border:1px solid var(--line);border-radius:var(--radius-sm);padding:10px 12px;width:100%;
+    transition:border-color .12s ease, box-shadow .12s ease;}
+  .field input::placeholder{color:color-mix(in srgb, var(--muted) 70%, transparent);}
+  .field input:hover{border-color:var(--muted);}
+  .field input:focus{outline:none;border-color:var(--accent);
+    box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);}
+  .field input[aria-invalid="true"]{border-color:var(--danger);}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media (max-width:520px){ .row2{grid-template-columns:1fr;} }
+  .locked{font-size:.74rem;color:var(--muted);background:var(--surface-2);
+    border:1px dashed var(--line);border-radius:var(--radius-sm);padding:10px 12px;line-height:1.45;}
+  .locked b{color:var(--ink);font-weight:600;}
+  .err{font-size:.72rem;color:var(--danger);font-weight:600;min-height:0;}
+
+  /* Layout picker */
+  .layouts{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .layoutopt{position:relative;}
+  /* Visually hidden but still focusable and exposed to assistive tech. */
+  .layoutopt input{position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+    overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0;}
+  .layoutopt span.box{display:flex;flex-direction:column;gap:6px;cursor:pointer;
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-sm);
+    padding:12px;transition:border-color .12s ease, box-shadow .12s ease;}
+  .layoutopt span.box .nm{font-size:.82rem;font-weight:600;color:var(--ink);}
+  .layoutopt span.box .ds{font-size:.72rem;color:var(--muted);line-height:1.4;}
+  .layoutopt span.box:hover{border-color:var(--muted);}
+  .layoutopt input:checked + span.box{border-color:var(--accent);
+    box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);}
+  .layoutopt input:focus-visible + span.box{outline:2px solid var(--accent);outline-offset:2px;}
+  .thumb{height:52px;border-radius:5px;border:1px solid var(--line);background:#fff;
+    display:flex;align-items:center;padding:6px;gap:5px;overflow:hidden;}
+  .thumb i{display:block;background:#C9C9DA;border-radius:1.5px;}
+  .thumb .stack{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;}
+  .thumb .blk{background:linear-gradient(135deg,#0A0A2A,#1F5FFF);border-radius:3px;flex:0 0 auto;}
+
+  /* Preview column */
+  .previewcol{position:sticky;top:20px;display:flex;flex-direction:column;gap:16px;}
+  @media (max-width:900px){ .previewcol{position:static;} }
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);overflow:hidden;}
+  .card .card-h{display:flex;align-items:center;justify-content:space-between;
+    padding:12px 16px;border-bottom:1px solid var(--line);gap:12px;}
+  .card .card-h .t{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;
+    font-weight:700;color:var(--muted);}
+  .card .card-h .n{font-size:.7rem;color:var(--muted);}
+  /* simulated email surface — always light; the signature assumes a white background */
+  .email{background:#ffffff;padding:16px 20px;overflow-x:auto;}
+  .email :where(table){max-width:none;}
+
+  .actions{display:flex;gap:10px;flex-wrap:wrap;}
+  button.btn{font:inherit;font-weight:600;font-size:.9rem;border-radius:var(--radius-sm);
+    padding:11px 18px;cursor:pointer;border:1px solid transparent;display:inline-flex;
+    align-items:center;gap:8px;transition:background .12s ease,border-color .12s ease,color .12s ease;}
+  button.primary{background:var(--accent);color:var(--accent-ink);}
+  button.primary:hover{background:var(--accent-strong);}
+  button.ghost{background:transparent;color:var(--ink);border-color:var(--line);}
+  button.ghost:hover{border-color:var(--muted);background:var(--surface-2);}
+  button.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  button.btn:active{transform:translateY(1px);}
+  button.btn[disabled]{opacity:.5;cursor:not-allowed;}
+  button.btn[disabled]:active{transform:none;}
+
+  details.src{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);}
+  details.src summary{cursor:pointer;list-style:none;padding:12px 16px;font-size:.82rem;
+    font-weight:600;color:var(--ink);display:flex;align-items:center;gap:8px;}
+  details.src summary::-webkit-details-marker{display:none;}
+  details.src summary .chev{transition:transform .15s ease;color:var(--muted);}
+  details.src[open] summary .chev{transform:rotate(90deg);}
+  details.src pre{margin:0;padding:14px 16px;border-top:1px solid var(--line);
+    font-family:var(--font-mono);font-size:.72rem;line-height:1.55;color:var(--muted);
+    white-space:pre;overflow-x:auto;}
+
+  .howto{font-size:.78rem;color:var(--muted);line-height:1.6;
+    background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;}
+  .howto b{color:var(--ink);font-weight:600;}
+  .howto ol{margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:4px;}
+
+  /* Toast */
+  #toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(16px);
+    background:var(--brand);color:#F4F5F9;font-size:.86rem;font-weight:600;
+    padding:11px 18px;border-radius:999px;box-shadow:0 8px 30px rgba(0,0,0,.28);
+    opacity:0;pointer-events:none;transition:opacity .2s ease, transform .2s ease;z-index:50;
+    display:flex;align-items:center;gap:9px;}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  #toast.err{background:var(--danger);color:#fff;}
+  @media (prefers-reduced-motion:reduce){ #toast{transition:opacity .2s ease;} }
+
+  footer.foot{margin-top:36px;padding-top:18px;border-top:1px solid var(--line);
+    font-size:.74rem;color:var(--muted);}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <img class="logo" id="headerLogo" alt="M13" />
+    <div class="brandwrap">
+      <span class="eyebrow">M13</span>
+      <h1>Email Signature Builder</h1>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- FORM -->
+    <form autocomplete="off" spellcheck="false">
+      <fieldset>
+        <legend>Identity</legend>
+        <div class="field">
+          <label for="name">Full name</label>
+          <input id="name" type="text" value="Karl Alomar" />
+        </div>
+        <div class="field">
+          <label for="title">Job title</label>
+          <input id="title" type="text" value="Partner" placeholder="optional" />
+          <span class="hint">Leave blank to hide this line.</span>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Contact</legend>
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" type="email" value="karl@m13.co" />
+          <span class="err" id="emailErr"></span>
+        </div>
+        <div class="field">
+          <label for="phone">Phone</label>
+          <input id="phone" type="text" value="" placeholder="optional — e.g. (909) 234 5678" />
+          <span class="hint">Leave blank to hide it. Becomes a click-to-call <code>tel:</code> link.</span>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Layout</legend>
+        <div class="layouts">
+          <label class="layoutopt">
+            <input type="radio" name="layout" value="1" checked />
+            <span class="box">
+              <span class="thumb">
+                <span class="stack">
+                  <i style="width:52%;height:7px;"></i>
+                  <i style="width:34%;height:5px;"></i>
+                  <i style="width:100%;height:1px;margin:2px 0;"></i>
+                  <i style="width:88%;height:5px;"></i>
+                </span>
+                <span class="blk" style="width:26px;height:13px;align-self:flex-start;"></span>
+              </span>
+              <span class="nm">Compact</span>
+              <span class="ds">Logo top-right, contact details on one line.</span>
+            </span>
+          </label>
+          <label class="layoutopt">
+            <input type="radio" name="layout" value="2" />
+            <span class="box">
+              <span class="thumb">
+                <span class="stack">
+                  <i style="width:56%;height:7px;"></i>
+                  <i style="width:36%;height:5px;"></i>
+                  <i style="width:74%;height:4px;"></i>
+                  <i style="width:66%;height:4px;"></i>
+                </span>
+                <span class="blk" style="width:40px;height:30px;"></span>
+              </span>
+              <span class="nm">Banner</span>
+              <span class="ds">Stacked details with the “brighter together” panel.</span>
+            </span>
+          </label>
+        </div>
+      </fieldset>
+
+      <div class="locked">
+        <b>Locked to brand:</b> the M13 logo, the banner panel, and the
+        <b>m13.co</b> website link are fixed, so every signature stays consistent.
+      </div>
+    </form>
+
+    <!-- PREVIEW -->
+    <div class="previewcol">
+      <div class="card">
+        <div class="card-h">
+          <span class="t">Live preview</span>
+          <span class="n">on a white email background</span>
+        </div>
+        <div class="email"><div id="preview"></div></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary" id="copyBtn" type="button">
+          <span aria-hidden="true">&#9109;</span> Copy signature
+        </button>
+        <button class="btn ghost" id="copyHtmlBtn" type="button">Copy HTML source</button>
+      </div>
+
+      <details class="src">
+        <summary><span class="chev">&#9656;</span> View HTML source</summary>
+        <pre id="source"></pre>
+      </details>
+
+      <div class="howto">
+        <b>Add it in Outlook:</b>
+        <ol>
+          <li>Click <b>Copy signature</b> above.</li>
+          <li>Outlook &rarr; <b>Settings &rarr; Mail &rarr; Compose and reply</b> (or <b>File &rarr; Options &rarr; Mail &rarr; Signatures</b> on Windows).</li>
+          <li>Create a signature and <b>paste</b> (&#8984;V / Ctrl+V) into the editor.</li>
+        </ol>
+      </div>
+    </div>
   </div>
-</body>
-</html>
+
+  <footer class="foot">
+    Built for the M13 team &middot; The preview shows a white background; some clients apply their own dark-mode recoloring on receipt.
+  </footer>
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  // Brand assets, hosted on the Webflow CDN. Email clients block data-URI images,
+  // so both the preview and the copied output reference these same URLs.
+  var CDN        = "https://cdn.prod.website-files.com/6a1e5c828336f205b2137ec6/";
+  var LOGO       = CDN + "6a58f2ea1cf5e7c3ac351e78_5b573785502d87f2418d20a3be8eeb95_Logo.png";
+  var BANNER     = CDN + "6a58f2eb143e45642fa850ee_465ac55235f31e5fd72cd7782a58612d_image.png";
+  var ICON_MAIL  = CDN + "6a58f2ea83ccc393631d34f0_ea4f102c428fa042ecca4b72a930d5ba_Icon_mail.png";
+  var ICON_PHONE = CDN + "6a58f2ea6540f1e639123eb9_a3066d04742dbab1d7f1e307b0e78c4e_Icon_phone.png";
+  var ICON_WEB   = CDN + "6a58f2ea61433c143df7e1d1_2e30b1e853f32ad1016eca84e305e036_Icon_web.png";
+
+  // Display sizes derived from each asset's true pixel ratio, so nothing distorts.
+  var LOGO_W = 80,  LOGO_H = 39;   // source 238x116
+  var BAN_W  = 200, BAN_H  = 149;  // source 648x482
+  var ICON   = 24;                 // source 64x64
+
+  var SITE_URL   = "https://www.m13.co";
+  var SITE_LABEL = "m13.co";
+
+  var INK = "#1a1a3d", MUTED = "#3d3d3d", LINE = "#e3e3ec";
+  var FONT = "Arial, Helvetica, sans-serif";
+
+  document.getElementById("headerLogo").src = LOGO;
+
+  function esc(s){
+    return String(s == null ? "" : s)
+      .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }
+  function telHref(p){
+    var d = String(p).replace(/[^\d+]/g,"");
+    return d ? "tel:" + d : "";
+  }
+  function val(id){ return (document.getElementById(id).value || "").trim(); }
+  function layoutVal(){
+    var r = document.querySelector('input[name="layout"]:checked');
+    return r ? r.value : "1";
+  }
+  function readForm(){
+    return {
+      name: val("name"), title: val("title"),
+      email: val("email"), phone: val("phone"),
+      layout: layoutVal()
+    };
+  }
+
+  function link(href, text){
+    return '<a href="' + esc(href) + '" style="color:' + INK + ';text-decoration:none;font-family:' + FONT
+      + ';font-size:12px;">' + esc(text) + '</a>';
+  }
+
+  // One icon+text pair. Returns the <td> cells; used inline (layout 1) and stacked (layout 2).
+  function contactCells(icon, alt, inner, padRight){
+    return '<td valign="middle" align="center" style="padding:0;width:' + ICON + 'px;height:' + ICON + 'px;font-size:0;line-height:0;">' +
+             '<img src="' + icon + '" width="' + ICON + '" height="' + ICON + '" alt="' + esc(alt) + '" ' +
+             'style="display:block;border:0;outline:none;text-decoration:none;width:' + ICON + 'px;height:' + ICON + 'px;" />' +
+           '</td>' +
+           '<td valign="middle" style="padding:0 ' + padRight + 'px 0 8px;font-family:' + FONT +
+             ';font-size:12px;line-height:14px;mso-line-height-rule:exactly;color:' + INK + ';white-space:nowrap;">' +
+             inner +
+           '</td>';
+  }
+
+  function contactItems(d){
+    var items = [];
+    if(d.email) items.push({icon:ICON_MAIL,  alt:"Email", inner:link("mailto:" + d.email, d.email)});
+    if(d.phone){
+      var href = telHref(d.phone);
+      items.push({icon:ICON_PHONE, alt:"Phone", inner: href ? link(href, d.phone) : esc(d.phone)});
+    }
+    items.push({icon:ICON_WEB, alt:"Web", inner:link(SITE_URL, SITE_LABEL)});
+    return items;
+  }
+
+  function divider(){
+    return '  <tr>\n' +
+           '    <td style="padding:0 24px;">\n' +
+           '      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse;">\n' +
+           '        <tr><td style="border-top:1px solid ' + LINE + ';font-size:0;line-height:0;">&nbsp;</td></tr>\n' +
+           '      </table>\n' +
+           '    </td>\n' +
+           '  </tr>\n';
+  }
+
+  function shell(inner){
+    return '<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" ' +
+           'style="width:600px;max-width:600px;border-collapse:collapse;font-family:' + FONT + ';background-color:#ffffff;">\n' +
+           inner +
+           '</table>';
+  }
+
+  function nameBlock(d, padBottom){
+    var rows = '<tr><td style="padding:0;font-family:' + FONT + ';font-size:18px;line-height:22px;' +
+      'mso-line-height-rule:exactly;font-weight:bold;color:' + INK + ';white-space:nowrap;">' + esc(d.name) + '</td></tr>';
+    if(d.title){
+      rows += '<tr><td style="padding:2px 0 0 0;font-family:' + FONT + ';font-size:14px;line-height:18px;' +
+        'mso-line-height-rule:exactly;color:' + MUTED + ';white-space:nowrap;">' + esc(d.title) + '</td></tr>';
+    }
+    return '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">' +
+      rows + '</table>';
+  }
+
+  // Layout 1 — name/title left, logo right, rule, contact details on a single line.
+  function buildLayout1(d){
+    var items = contactItems(d);
+    var cells = "";
+    for(var i=0;i<items.length;i++){
+      var last = (i === items.length - 1);
+      cells += contactCells(items[i].icon, items[i].alt, items[i].inner, last ? 0 : 8);
+      if(!last) cells += '<td style="padding:0 8px;font-size:0;line-height:0;">&nbsp;</td>';
+    }
+
+    var head =
+      '  <tr>\n' +
+      '    <td style="padding:20px 24px 16px 24px;">\n' +
+      '      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse;">\n' +
+      '        <tr>\n' +
+      '          <td valign="middle" align="left" style="padding:0;">' + nameBlock(d) + '</td>\n' +
+      '          <td valign="middle" align="right" style="padding:0;width:' + LOGO_W + 'px;font-size:0;line-height:0;">\n' +
+      '            <img src="' + LOGO + '" width="' + LOGO_W + '" height="' + LOGO_H + '" alt="M13" ' +
+                    'style="display:block;border:0;outline:none;text-decoration:none;width:' + LOGO_W + 'px;height:' + LOGO_H + 'px;" />\n' +
+      '          </td>\n' +
+      '        </tr>\n' +
+      '      </table>\n' +
+      '    </td>\n' +
+      '  </tr>\n';
+
+    var contact =
+      '  <tr>\n' +
+      '    <td style="padding:16px 24px 20px 24px;">\n' +
+      '      <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">\n' +
+      '        <tr>' + cells + '</tr>\n' +
+      '      </table>\n' +
+      '    </td>\n' +
+      '  </tr>\n';
+
+    return shell(head + divider() + contact);
+  }
+
+  // Layout 2 — stacked details left, banner panel right, rule underneath.
+  function buildLayout2(d){
+    var items = contactItems(d);
+    var rows = '<tr><td style="padding:0 0 16px 0;">' + nameBlock(d) + '</td></tr>';
+    for(var i=0;i<items.length;i++){
+      var pad = (i === items.length - 1) ? 0 : 8;
+      rows += '<tr><td style="padding:0 0 ' + pad + 'px 0;">' +
+        '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;"><tr>' +
+        contactCells(items[i].icon, items[i].alt, items[i].inner, 0) +
+        '</tr></table></td></tr>';
+    }
+
+    var body =
+      '  <tr>\n' +
+      '    <td style="padding:20px 24px;">\n' +
+      '      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse;">\n' +
+      '        <tr>\n' +
+      '          <td valign="top" align="left" style="padding:0;">\n' +
+      '            <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">' + rows + '</table>\n' +
+      '          </td>\n' +
+      '          <td style="padding:0 12px;font-size:0;line-height:0;">&nbsp;</td>\n' +
+      '          <td valign="top" align="right" style="padding:0;width:' + BAN_W + 'px;font-size:0;line-height:0;">\n' +
+      '            <img src="' + BANNER + '" width="' + BAN_W + '" height="' + BAN_H + '" alt="M13 &mdash; We are brighter together." ' +
+                    'style="display:block;border:0;outline:none;text-decoration:none;width:' + BAN_W + 'px;height:' + BAN_H + 'px;" />\n' +
+      '          </td>\n' +
+      '        </tr>\n' +
+      '      </table>\n' +
+      '    </td>\n' +
+      '  </tr>\n';
+
+    return shell(body + divider());
+  }
+
+  function buildSignature(d){
+    return d.layout === "2" ? buildLayout2(d) : buildLayout1(d);
+  }
+
+  function buildPlain(d){
+    var L = [];
+    if(d.name)  L.push(d.name);
+    if(d.title) L.push(d.title);
+    if(d.email) L.push(d.email);
+    if(d.phone) L.push(d.phone);
+    L.push(SITE_LABEL + "  " + SITE_URL);
+    return L.join("\n");
+  }
+
+  // --- Validation ---
+  var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  function validate(d){
+    var el = document.getElementById("email"), msg = document.getElementById("emailErr");
+    var bad = !!d.email && !EMAIL_RE.test(d.email);
+    var empty = !d.email;
+    el.setAttribute("aria-invalid", (bad || empty) ? "true" : "false");
+    msg.textContent = empty ? "An email address is required."
+                    : bad   ? "That doesn’t look like a valid email address."
+                    : "";
+    return !bad && !empty && !!d.name;
+  }
+
+  // --- Render ---
+  var previewEl = document.getElementById("preview");
+  var sourceEl  = document.getElementById("source");
+  var copyBtn   = document.getElementById("copyBtn");
+  var copyHtmlBtn = document.getElementById("copyHtmlBtn");
+
+  function render(){
+    var d = readForm();
+    var ok = validate(d);
+    var html = buildSignature(d);
+    previewEl.innerHTML = html;
+    sourceEl.textContent = html;
+    copyBtn.disabled = !ok;
+    copyHtmlBtn.disabled = !ok;
+  }
+
+  // --- Clipboard ---
+  var toastEl = document.getElementById("toast");
+  var toastTimer = null;
+  function toast(msg, isErr){
+    toastEl.textContent = msg;
+    toastEl.className = isErr ? "show err" : "show";
+    if(toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toastEl.className = ""; }, 2600);
+  }
+
+  function legacyCopyHTML(html){
+    var holder = document.createElement("div");
+    holder.setAttribute("contenteditable", "true");
+    holder.style.position = "fixed";
+    holder.style.left = "-9999px";
+    holder.style.top = "0";
+    holder.style.whiteSpace = "pre-wrap";
+    holder.innerHTML = html;
+    document.body.appendChild(holder);
+    var range = document.createRange();
+    range.selectNodeContents(holder);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    var ok = false;
+    try { ok = document.execCommand("copy"); } catch(e){ ok = false; }
+    sel.removeAllRanges();
+    document.body.removeChild(holder);
+    return ok;
+  }
+
+  async function copySignature(){
+    var d = readForm();
+    if(!validate(d)) return;
+    var html = buildSignature(d);
+    var text = buildPlain(d);
+    // Preferred: rich clipboard write, so formatting survives the paste into Outlook.
+    if(window.ClipboardItem && navigator.clipboard && navigator.clipboard.write){
+      try{
+        await navigator.clipboard.write([ new ClipboardItem({
+          "text/html":  new Blob([html], {type:"text/html"}),
+          "text/plain": new Blob([text], {type:"text/plain"})
+        })]);
+        toast("Copied — paste into your signature editor");
+        return;
+      }catch(e){ /* fall through to legacy */ }
+    }
+    if(legacyCopyHTML(html)) toast("Copied — paste into your signature editor");
+    else toast("Copy blocked — open “View HTML source” and copy manually", true);
+  }
+
+  async function copyHtmlSource(){
+    var d = readForm();
+    if(!validate(d)) return;
+    var html = buildSignature(d);
+    try{
+      await navigator.clipboard.writeText(html);
+      toast("HTML source copied");
+    }catch(e){
+      var range = document.createRange();
+      range.selectNodeContents(sourceEl);
+      var sel = window.getSelection();
+      sel.removeAllRanges(); sel.addRange(range);
+      var ok=false; try{ ok=document.execCommand("copy"); }catch(_){}
+      sel.removeAllRanges();
+      toast(ok ? "HTML source copied" : "Copy blocked — select the source manually", !ok);
+    }
+  }
+
+  // --- Wire up ---
+  var inputs = document.querySelectorAll("form input");
+  for(var i=0;i<inputs.length;i++){
+    inputs[i].addEventListener("input", render);
+    inputs[i].addEventListener("change", render);
+  }
+  copyBtn.addEventListener("click", copySignature);
+  copyHtmlBtn.addEventListener("click", copyHtmlSource);
+
+  render();
+})();
+</script>
