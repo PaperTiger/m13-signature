@@ -13,7 +13,7 @@ Gmail, and Apple Mail.
   - **Compact** — name and title on the left, M13 logo top-right, a rule, then all
     contact details on a single line.
   - **Banner** — stacked contact details on the left with the "We are brighter
-    together." panel on the right.
+    together." panel on the right. No rule.
 - **One-click copy** — puts a formatted (rich-HTML) signature on the clipboard so it
   pastes with all styling intact. Also copies a plain-text fallback.
 - **Copy HTML source** for anyone pasting into an HTML signature field.
@@ -21,8 +21,8 @@ Gmail, and Apple Mail.
   out, with spacing recalculated automatically.
 - **Optional ranking badge** (off by default) — the "#3 Global VC firm / HEC Paris"
   panel. On **Compact** it sits to the right and the signature narrows to match, so the
-  pair still totals 600px. On **Banner** it sits immediately left of the panel, scaled
-  to the same height.
+  pair still totals 600px. On **Banner** it sits immediately left of the panel, at the
+  same height.
 - **Width guard** — the contact cells are `white-space:nowrap`, so unusually long
   details can push the table past 600px rather than wrapping. The builder measures what
   actually rendered and warns, instead of letting an oversized signature reach an inbox.
@@ -45,13 +45,12 @@ Copy is disabled until the name and a well-formed email are present.
 ### Length limits with the badge on
 
 The badge takes horizontal room from a fixed 600px, and the contact cells don't wrap.
-With the badge **off** there is no practical limit. With it **on**:
 
 | Combination | Longest email that still fits |
 | --- | --- |
-| Compact + badge + phone | 21 characters |
-| Compact + badge, no phone | no limit |
-| Banner + badge | 25 characters |
+| Badge on (either layout) | 25 characters |
+| Compact + badge, no phone | no practical limit |
+| Badge off | no practical limit (46+ on Compact) |
 
 M13's first-name addresses (`karl@m13.co`, 11) sit well inside this. If a longer one is
 ever needed, the builder warns with the exact overflow in pixels.
@@ -75,11 +74,12 @@ of that:
   | Logo | 238×116 | 80×39 |
   | Banner panel | 648×482 | 200×149 |
   | Contact icons | 64×64 | 24×24 |
-  | Ranking badge (@2x) | 300×363 | 150×182 on Compact, 123×149 on Banner |
+  | Ranking badge | 266×322 | 123×149 |
 
-  The badge is a retina export, so its true 1x size is 150×181.5. Compact uses that
-  size; Banner scales it to 149px so it matches the panel exactly. The panel itself
-  never changes size when the badge is toggled.
+  Nothing renders taller than 150px. The badge uses one size in both layouts: it matches
+  the banner panel's height exactly, and the panel never resizes when the badge is
+  toggled. Like the panel, the badge's rounded corners are baked into the PNG with
+  transparent corners, so Outlook can't square them off.
 
 - **Images are hosted PNGs** on the Webflow CDN. Email clients block data-URI images, so
   the preview and the copied output both reference the same absolute CDN URLs.
@@ -101,17 +101,6 @@ var SITE_URL   = "https://www.m13.co";
 If you re-export an asset, upload the new PNG to the Webflow assets and update the
 matching constant. If its aspect ratio changes, update the `LOGO_W`/`LOGO_H`,
 `BAN_W`/`BAN_H`, or `ICON` constants directly below to match, or the image will distort.
-
-## Known issue: the badge has square corners
-
-The banner panel is a PNG whose rounded corners are baked in with transparent corners
-(all four corner pixels are `rgba(0,0,0,0)`). The ranking badge is a **JPEG**, which
-cannot hold transparency — its corners are opaque colour, so it renders as a square.
-Side by side on the Banner layout the two shapes don't match.
-
-CSS `border-radius` is not a fix: Outlook strips it, which is exactly why the panel has
-its corners baked in. To match, re-export the badge as a **PNG with transparent rounded
-corners** (~24px radius at the 300px source width ≈ 12px on Compact) and update `BADGE`.
 
 ## The email domain is `m13.co`, not `m13.com`
 

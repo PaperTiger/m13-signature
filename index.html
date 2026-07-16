@@ -334,18 +334,19 @@
   var ICON_MAIL  = CDN + "6a58f2ea83ccc393631d34f0_ea4f102c428fa042ecca4b72a930d5ba_Icon_mail.png";
   var ICON_PHONE = CDN + "6a58f2ea6540f1e639123eb9_a3066d04742dbab1d7f1e307b0e78c4e_Icon_phone.png";
   var ICON_WEB   = CDN + "6a58f2ea61433c143df7e1d1_2e30b1e853f32ad1016eca84e305e036_Icon_web.png";
-  var BADGE      = CDN + "6a58fe44b001dca9f698d204_CleanShot%202026-07-16%20at%2011.50.38%402x.jpg";
+  var BADGE      = CDN + "6a5901115fdec0168317f7f5_hec-new.png";
 
   // Display sizes derived from each asset's true pixel ratio, so nothing distorts.
   var LOGO_W = 80,  LOGO_H = 39;   // source 238x116
   var BAN_W  = 200, BAN_H  = 149;  // source 648x482
   var ICON   = 24;                 // source 64x64
 
-  // The badge is a retina (@2x) export: 300x363 source => 150x181.5 at 1x.
-  var SIG_W    = 600;              // total signature width, badge on or off
+  // Badge: 266x322 source, rounded corners baked in with transparent corners.
+  // One size for both layouts — it matches the banner panel's height exactly and
+  // stays inside the 150px ceiling.
+  var SIG_W     = 600;             // total signature width, badge on or off
   var BADGE_GAP = 16;
-  var BADGE_W_C = 150, BADGE_H_C = 182;  // Compact: the asset's true 1x size
-  var BADGE_H_B = BAN_H, BADGE_W_B = 123; // Banner: matched to the panel's height
+  var BADGE_W   = 123, BADGE_H = BAN_H;  // 123x149
   var BADGE_ALT = "M13 &mdash; named the #3 Global VC firm by HEC Paris, " +
                   "2024 Venture Capital Performance Ranking";
 
@@ -435,7 +436,7 @@
   }
 
   // Puts the ranking badge to the right of a signature block. The block has already
-  // been narrowed by BADGE_GAP + BADGE_W_C, so the pair still totals SIG_W.
+  // been narrowed by BADGE_GAP + BADGE_W, so the pair still totals SIG_W.
   function badgeBeside(sigHtml){
     return '<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="' + SIG_W + '" ' +
            'style="width:' + SIG_W + 'px;max-width:' + SIG_W + 'px;border-collapse:collapse;background-color:#ffffff;">\n' +
@@ -444,8 +445,8 @@
            '      ' + sigHtml + '\n' +
            '    </td>\n' +
            '    <td style="padding:0;width:' + BADGE_GAP + 'px;font-size:0;line-height:0;">&nbsp;</td>\n' +
-           '    <td valign="middle" align="right" style="padding:0;width:' + BADGE_W_C + 'px;font-size:0;line-height:0;">\n' +
-           '      ' + imgLink(BADGE, BADGE_W_C, BADGE_H_C, BADGE_ALT) + '\n' +
+           '    <td valign="middle" align="right" style="padding:0;width:' + BADGE_W + 'px;font-size:0;line-height:0;">\n' +
+           '      ' + imgLink(BADGE, BADGE_W, BADGE_H, BADGE_ALT) + '\n' +
            '    </td>\n' +
            '  </tr>\n' +
            '</table>';
@@ -496,7 +497,7 @@
       '  </tr>\n';
 
     // With the badge on, the signature narrows so the pair still totals SIG_W.
-    var sigW = d.badge ? SIG_W - BADGE_GAP - BADGE_W_C : SIG_W;
+    var sigW = d.badge ? SIG_W - BADGE_GAP - BADGE_W : SIG_W;
     var sig = shell(head + divider() + contact, sigW);
     return d.badge ? badgeBeside(sig) : sig;
   }
@@ -506,8 +507,8 @@
   function buildLayout2(d){
     var items = contactItems(d);
     var badgeCell = d.badge
-      ? '          <td valign="top" align="right" style="padding:0;width:' + BADGE_W_B + 'px;font-size:0;line-height:0;">\n' +
-        '            ' + imgLink(BADGE, BADGE_W_B, BADGE_H_B, BADGE_ALT) + '\n' +
+      ? '          <td valign="top" align="right" style="padding:0;width:' + BADGE_W + 'px;font-size:0;line-height:0;">\n' +
+        '            ' + imgLink(BADGE, BADGE_W, BADGE_H, BADGE_ALT) + '\n' +
         '          </td>\n' +
         '          <td style="padding:0 6px;font-size:0;line-height:0;">&nbsp;</td>\n'
       : '';
@@ -538,7 +539,7 @@
       '    </td>\n' +
       '  </tr>\n';
 
-    return shell(body + divider());
+    return shell(body);
   }
 
   function buildSignature(d){
