@@ -1,8 +1,8 @@
 # M13 Email Signature Builder
 
 A single-page tool for creating on-brand M13 email signatures. Fill in your details,
-watch the live preview update, and copy a signature that pastes cleanly into Outlook,
-Gmail, and Apple Mail.
+watch the live preview update, and copy a signature that pastes cleanly into Gmail —
+M13 runs on Google Workspace — as well as Outlook and Apple Mail.
 
 **Live:** https://papertiger.github.io/m13-signature/
 
@@ -57,11 +57,18 @@ The badge takes horizontal room from a fixed width, and the contact cells don't 
 M13's first-name addresses (`karl@m13.co`, 11) sit well inside this. If a longer one is
 ever needed, the builder warns with the exact overflow in pixels.
 
-## Why it survives paste into Outlook
+## Why it survives the paste, and the trip to a recipient
 
-Email clients rewrite `<p>` margins and `line-height` and ignore `border-radius`, which
-is what makes pasted signatures look loose or square-cornered. This builder avoids all
-of that:
+Two different things have to hold up, and they pull in different directions:
+
+1. **Composing.** The signature is pasted into **Gmail**, since M13 is on Google
+   Workspace. That's what the "Add it in Gmail" steps in the app cover.
+2. **Receiving.** Whoever opens the email may well be on **Outlook**, whose Word-based
+   renderer rewrites `<p>` margins and `line-height` and ignores `border-radius` — the
+   usual reason a pasted signature arrives looking loose or square-cornered.
+
+So the markup stays Outlook-safe even though nobody here composes in Outlook. Don't
+"simplify" it to Gmail-only HTML: that would only break the copy on its way *out*.
 
 - **Table-based layout** with spacing driven by `<td>` padding (respected on paste),
   not paragraph margins.
@@ -91,6 +98,8 @@ of that:
 
 - **Images are hosted PNGs** on the Webflow CDN. Email clients block data-URI images, so
   the preview and the copied output both reference the same absolute CDN URLs.
+- **Well inside Gmail's signature limit.** Gmail caps a signature at 10,000 characters.
+  The largest combination here is Compact + badge at ~5,100 — about half the budget.
 
 ## Editing brand constants
 

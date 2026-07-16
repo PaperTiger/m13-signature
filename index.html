@@ -304,11 +304,13 @@
       </details>
 
       <div class="howto">
-        <b>Add it in Outlook:</b>
+        <b>Add it in Gmail:</b>
         <ol>
           <li>Click <b>Copy signature</b> above.</li>
-          <li>Outlook &rarr; <b>Settings &rarr; Mail &rarr; Compose and reply</b> (or <b>File &rarr; Options &rarr; Mail &rarr; Signatures</b> on Windows).</li>
-          <li>Create a signature and <b>paste</b> (&#8984;V / Ctrl+V) into the editor.</li>
+          <li>In Gmail, open <b>Settings</b> (the gear, top right) &rarr; <b>See all settings</b> &rarr; the <b>General</b> tab.</li>
+          <li>Scroll to <b>Signature</b>, click <b>Create new</b> and name it, then <b>paste</b> (&#8984;V / Ctrl+V) into the box.</li>
+          <li>Under <b>Signature defaults</b>, pick it for new emails and replies.</li>
+          <li>Scroll to the bottom and click <b>Save Changes</b> &mdash; Gmail discards the signature if you navigate away first.</li>
         </ol>
       </div>
     </div>
@@ -651,7 +653,7 @@
     if(!validate(d)) return;
     var html = buildSignature(d);
     var text = buildPlain(d);
-    // Preferred: rich clipboard write, so formatting survives the paste into Outlook.
+    // Preferred: rich clipboard write, so formatting survives the paste into Gmail.
     if(window.ClipboardItem && navigator.clipboard && navigator.clipboard.write){
       try{
         await navigator.clipboard.write([ new ClipboardItem({
