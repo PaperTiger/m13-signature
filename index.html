@@ -121,6 +121,7 @@
   button.primary:hover{background:var(--accent-strong);}
   button.ghost{background:transparent;color:var(--ink);border-color:var(--line);}
   button.ghost:hover{border-color:var(--muted);background:var(--surface-2);}
+  button.btn svg{flex:0 0 auto;}
   button.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
   button.btn:active{transform:translateY(1px);}
   button.btn[disabled]{opacity:.5;cursor:not-allowed;}
@@ -250,7 +251,13 @@
 
       <div class="actions">
         <button class="btn primary" id="copyBtn" type="button">
-          <span aria-hidden="true">&#9109;</span> Copy signature
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+               aria-hidden="true" focusable="false">
+            <rect x="8" y="8" width="14" height="14" rx="2" ry="2" />
+            <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+          </svg>
+          Copy signature
         </button>
         <button class="btn ghost" id="copyHtmlBtn" type="button">Copy HTML source</button>
       </div>
@@ -330,6 +337,15 @@
       + ';font-size:12px;">' + esc(text) + '</a>';
   }
 
+  // Wraps a brand image in a link to the site. border:0 keeps Outlook and older
+  // clients from drawing a blue link border around the image.
+  function imgLink(src, w, h, alt){
+    return '<a href="' + SITE_URL + '" style="text-decoration:none;border:0;">' +
+             '<img src="' + src + '" width="' + w + '" height="' + h + '" alt="' + alt + '" ' +
+             'style="display:block;border:0;outline:none;text-decoration:none;width:' + w + 'px;height:' + h + 'px;" />' +
+           '</a>';
+  }
+
   // One icon+text pair. Returns the <td> cells; used inline (layout 1) and stacked (layout 2).
   function contactCells(icon, alt, inner, padRight){
     return '<td valign="middle" align="center" style="padding:0;width:' + ICON + 'px;height:' + ICON + 'px;font-size:0;line-height:0;">' +
@@ -398,8 +414,7 @@
       '        <tr>\n' +
       '          <td valign="middle" align="left" style="padding:0;">' + nameBlock(d) + '</td>\n' +
       '          <td valign="middle" align="right" style="padding:0;width:' + LOGO_W + 'px;font-size:0;line-height:0;">\n' +
-      '            <img src="' + LOGO + '" width="' + LOGO_W + '" height="' + LOGO_H + '" alt="M13" ' +
-                    'style="display:block;border:0;outline:none;text-decoration:none;width:' + LOGO_W + 'px;height:' + LOGO_H + 'px;" />\n' +
+      '            ' + imgLink(LOGO, LOGO_W, LOGO_H, "M13") + '\n' +
       '          </td>\n' +
       '        </tr>\n' +
       '      </table>\n' +
@@ -440,8 +455,7 @@
       '          </td>\n' +
       '          <td style="padding:0 12px;font-size:0;line-height:0;">&nbsp;</td>\n' +
       '          <td valign="top" align="right" style="padding:0;width:' + BAN_W + 'px;font-size:0;line-height:0;">\n' +
-      '            <img src="' + BANNER + '" width="' + BAN_W + '" height="' + BAN_H + '" alt="M13 &mdash; We are brighter together." ' +
-                    'style="display:block;border:0;outline:none;text-decoration:none;width:' + BAN_W + 'px;height:' + BAN_H + 'px;" />\n' +
+      '            ' + imgLink(BANNER, BAN_W, BAN_H, "M13 &mdash; We are brighter together.") + '\n' +
       '          </td>\n' +
       '        </tr>\n' +
       '      </table>\n' +

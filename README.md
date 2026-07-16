@@ -20,7 +20,7 @@ Gmail, and Apple Mail.
 - **Optional fields auto-hide** — leave the phone or job title blank and the line drops
   out, with spacing recalculated automatically.
 - **Brand-locked** logo, banner panel, and `m13.co` website link, so every signature
-  stays consistent.
+  stays consistent. The logo and the banner panel both link to `m13.co` too.
 
 ## Fields
 
