@@ -42,10 +42,9 @@
   /* Header */
   header.top{display:flex;align-items:center;gap:14px;padding-bottom:20px;
     border-bottom:1px solid var(--line);margin-bottom:28px;}
-  header.top img.logo{width:62px;height:auto;display:block;flex:0 0 auto;}
-  @media (prefers-color-scheme: dark){ header.top img.logo{filter:invert(1) brightness(1.6);} }
-  :root[data-theme="dark"] header.top img.logo{filter:invert(1) brightness(1.6);}
-  :root[data-theme="light"] header.top img.logo{filter:none;}
+  /* The logo now ships on a white plate, so it reads on either theme unaided —
+     inverting it would turn the plate black. */
+  header.top img.logo{width:74px;height:auto;display:block;flex:0 0 auto;border-radius:4px;}
   .brandwrap{display:flex;flex-direction:column;gap:2px;min-width:0;}
   .brandwrap .eyebrow{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;
     color:var(--accent);font-weight:700;}
@@ -329,7 +328,7 @@
   // Brand assets, hosted on the Webflow CDN. Email clients block data-URI images,
   // so both the preview and the copied output reference these same URLs.
   var CDN        = "https://cdn.prod.website-files.com/6a1e5c828336f205b2137ec6/";
-  var LOGO       = CDN + "6a58f2ea1cf5e7c3ac351e78_5b573785502d87f2418d20a3be8eeb95_Logo.png";
+  var LOGO       = CDN + "6a59037f3b6bc2e4e53a59f8_Frame%203.png";
   var BANNER     = CDN + "6a58f2eb143e45642fa850ee_465ac55235f31e5fd72cd7782a58612d_image.png";
   var ICON_MAIL  = CDN + "6a58f2ea83ccc393631d34f0_ea4f102c428fa042ecca4b72a930d5ba_Icon_mail.png";
   var ICON_PHONE = CDN + "6a58f2ea6540f1e639123eb9_a3066d04742dbab1d7f1e307b0e78c4e_Icon_phone.png";
@@ -337,16 +336,26 @@
   var BADGE      = CDN + "6a5901115fdec0168317f7f5_hec-new.png";
 
   // Display sizes derived from each asset's true pixel ratio, so nothing distorts.
-  var LOGO_W = 80,  LOGO_H = 39;   // source 238x116
+  // The logo sits on a white plate with ~23px of padding baked in, so it renders
+  // larger than the bare mark did (238x115 of ink inside a 284x150 canvas). 97x51
+  // keeps the mark itself at the 39px height it had before the plate was added.
+  var LOGO_W = 97,  LOGO_H = 51;   // source 284x150
   var BAN_W  = 200, BAN_H  = 149;  // source 648x482
   var ICON   = 24;                 // source 64x64
 
   // Badge: 266x322 source, rounded corners baked in with transparent corners.
   // One size for both layouts — it matches the banner panel's height exactly and
   // stays inside the 150px ceiling.
-  var SIG_W     = 600;             // total signature width, badge on or off
-  var BADGE_GAP = 16;
-  var BADGE_W   = 123, BADGE_H = BAN_H;  // 123x149
+  var SIG_W   = 600;               // Banner, and Compact without the badge
+  var BADGE_W = 123, BADGE_H = BAN_H;  // 123x149
+
+  // Compact with the badge: the block keeps the 461px width it already had and only
+  // the gap tightens, so the pair now totals 587px instead of 600px. The visible
+  // space between the block's content and the badge is the block's own 24px padding
+  // plus BADGE_GAP — 27px, down 33% from the 40px it was.
+  var SIG_W_BADGE = 461;
+  var BADGE_GAP   = 3;
+  var TOTAL_BADGE = SIG_W_BADGE + BADGE_GAP + BADGE_W;  // 587
   var BADGE_ALT = "M13 &mdash; named the #3 Global VC firm by HEC Paris, " +
                   "2024 Venture Capital Performance Ranking";
 
@@ -435,11 +444,11 @@
            '</table>';
   }
 
-  // Puts the ranking badge to the right of a signature block. The block has already
-  // been narrowed by BADGE_GAP + BADGE_W, so the pair still totals SIG_W.
+  // Puts the ranking badge to the right of the signature block; the pair totals
+  // TOTAL_BADGE.
   function badgeBeside(sigHtml){
-    return '<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="' + SIG_W + '" ' +
-           'style="width:' + SIG_W + 'px;max-width:' + SIG_W + 'px;border-collapse:collapse;background-color:#ffffff;">\n' +
+    return '<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="' + TOTAL_BADGE + '" ' +
+           'style="width:' + TOTAL_BADGE + 'px;max-width:' + TOTAL_BADGE + 'px;border-collapse:collapse;background-color:#ffffff;">\n' +
            '  <tr>\n' +
            '    <td valign="middle" align="left" style="padding:0;">\n' +
            '      ' + sigHtml + '\n' +
@@ -496,9 +505,7 @@
       '    </td>\n' +
       '  </tr>\n';
 
-    // With the badge on, the signature narrows so the pair still totals SIG_W.
-    var sigW = d.badge ? SIG_W - BADGE_GAP - BADGE_W : SIG_W;
-    var sig = shell(head + divider() + contact, sigW);
+    var sig = shell(head + divider() + contact, d.badge ? SIG_W_BADGE : SIG_W);
     return d.badge ? badgeBeside(sig) : sig;
   }
 
@@ -579,12 +586,17 @@
   // instead of wrapping. Measure what actually rendered and say so, rather than
   // letting a too-wide signature reach someone's inbox unnoticed.
   var warnEl = document.getElementById("widthWarn");
-  function checkWidth(){
+  // Compact with the badge is the one layout that isn't SIG_W wide.
+  function expectedWidth(d){
+    return (d.layout !== "2" && d.badge) ? TOTAL_BADGE : SIG_W;
+  }
+  function checkWidth(d){
     var t = previewEl.querySelector("table");
-    var over = t ? t.offsetWidth - SIG_W : 0;
+    var target = expectedWidth(d);
+    var over = t ? t.offsetWidth - target : 0;
     if(over > 0){
       warnEl.innerHTML = '<b>' + over + 'px too wide.</b> This combination renders at ' +
-        t.offsetWidth + 'px instead of ' + SIG_W + 'px. Shorten the email or phone, ' +
+        t.offsetWidth + 'px instead of ' + target + 'px. Shorten the email or phone, ' +
         'or turn the badge off.';
       warnEl.hidden = false;
     } else {
@@ -600,7 +612,7 @@
     sourceEl.textContent = html;
     copyBtn.disabled = !ok;
     copyHtmlBtn.disabled = !ok;
-    checkWidth();
+    checkWidth(d);
   }
 
   // --- Clipboard ---

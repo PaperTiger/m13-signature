@@ -20,12 +20,13 @@ Gmail, and Apple Mail.
 - **Optional fields auto-hide** — leave the phone or job title blank and the line drops
   out, with spacing recalculated automatically.
 - **Optional ranking badge** (off by default) — the "#3 Global VC firm / HEC Paris"
-  panel. On **Compact** it sits to the right and the signature narrows to match, so the
-  pair still totals 600px. On **Banner** it sits immediately left of the panel, at the
-  same height.
+  panel. On **Compact** it sits to the right, 27px from the signature block, and the
+  pair totals 587px. On **Banner** it sits immediately left of the panel, at the same
+  height, and the layout stays 600px.
 - **Width guard** — the contact cells are `white-space:nowrap`, so unusually long
-  details can push the table past 600px rather than wrapping. The builder measures what
-  actually rendered and warns, instead of letting an oversized signature reach an inbox.
+  details can push the table past its target width rather than wrapping. The builder
+  measures what actually rendered and warns, instead of letting an oversized signature
+  reach an inbox.
 - **Brand-locked** logo, banner panel, and `m13.co` website link, so every signature
   stays consistent. The logo and the banner panel both link to `m13.co` too.
 
@@ -44,13 +45,14 @@ Copy is disabled until the name and a well-formed email are present.
 
 ### Length limits with the badge on
 
-The badge takes horizontal room from a fixed 600px, and the contact cells don't wrap.
+The badge takes horizontal room from a fixed width, and the contact cells don't wrap.
 
 | Combination | Longest email that still fits |
 | --- | --- |
-| Badge on (either layout) | 25 characters |
-| Compact + badge, no phone | no practical limit |
-| Badge off | no practical limit (46+ on Compact) |
+| Compact + badge + phone | 23 characters |
+| Banner + badge | 25 characters |
+| Compact + badge, no phone | 46 characters |
+| Badge off | 46+ characters (no practical limit) |
 
 M13's first-name addresses (`karl@m13.co`, 11) sit well inside this. If a longer one is
 ever needed, the builder warns with the exact overflow in pixels.
@@ -71,7 +73,7 @@ of that:
 
   | Asset | Source | Rendered |
   | --- | --- | --- |
-  | Logo | 238×116 | 80×39 |
+  | Logo | 284×150 | 97×51 |
   | Banner panel | 648×482 | 200×149 |
   | Contact icons | 64×64 | 24×24 |
   | Ranking badge | 266×322 | 123×149 |
@@ -80,6 +82,12 @@ of that:
   the banner panel's height exactly, and the panel never resizes when the badge is
   toggled. Like the panel, the badge's rounded corners are baked into the PNG with
   transparent corners, so Outlook can't square them off.
+
+  The logo ships on a **white plate** — 238×115 of ink centred in a 284×150 canvas with
+  ~23px of padding — which keeps the dark mark legible where a client recolours for dark
+  mode. Because of that padding it is rendered at 97×51 rather than the bare mark's old
+  80×39: that keeps the mark itself at the same 39px height it has always been. Sizing
+  the plate to 80px wide would silently shrink the mark to 32px.
 
 - **Images are hosted PNGs** on the Webflow CDN. Email clients block data-URI images, so
   the preview and the copied output both reference the same absolute CDN URLs.
